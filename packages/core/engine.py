@@ -19,11 +19,11 @@ class Engine:
             logger.error(f'Failed to load anomaly detection model: {str(e)}')
             raise AnomalyDetectionError('Failed to load anomaly detection model')
 
-    def detect_anomalies(self) -> List[AnomalyAlert]:
+    def detect_anomalies(self, sensor_data: List[Dict]) -> List[AnomalyAlert]:
         try:
             # Use the loaded model to detect anomalies in the sensor data
             anomalies = []
-            for data in self.sensor_data:
+            for data in sensor_data:
                 # Apply the model to the data
                 if self.anomaly_detection_model:
                     # If the model detects an anomaly, add it to the list
@@ -45,7 +45,7 @@ class Engine:
         try:
             # Process the sensor data and detect anomalies
             self.federated_learning(sensor_data)
-            anomalies = self.detect_anomalies()
+            anomalies = self.detect_anomalies([sensor_data.to_dict()])
             return anomalies
         except Exception as e:
             logger.error(f'Failed to process sensor data: {str(e)}')
