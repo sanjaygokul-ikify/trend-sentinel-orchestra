@@ -54,3 +54,8 @@ class Engine:
 
     def __str__(self) -> str:
         return 'Engine'
+
+    # Added detect_anomalies method type annotation
+    def detect_anomalies(self, sensor_data: List[Dict]) -> List[AnomalyAlert]:
+        # existing method implementation
+        pass
