@@ -27,9 +27,10 @@ class Engine:
             anomalies = []
             for data in sensor_data:
                 # Apply the model to the data
-                if self.anomaly_detection_model:
-                    # If the model detects an anomaly, add it to the list
-                    anomalies.append(AnomalyAlert(data['id'], data['value']))
+                if data.get('id') and data.get('value'):
+                    if self.anomaly_detection_model:
+                        # If the model detects an anomaly, add it to the list
+                        anomalies.append(AnomalyAlert(data['id'], data['value']))
             return anomalies
         except Exception as e:
             logger.error(f'Failed to detect anomalies: {str(e)}')
@@ -54,8 +55,3 @@ class Engine:
 
     def __str__(self) -> str:
         return 'Engine'
-
-    # Added detect_anomalies method type annotation
-    def detect_anomalies(self, sensor_data: List[Dict]) -> List[AnomalyAlert]:
-        # existing method implementation
-        pass
