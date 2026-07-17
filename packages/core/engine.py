@@ -55,3 +55,31 @@ class Engine:
 
     def __str__(self) -> str:
         return 'Engine'
+
+    def detect_anomalies_with_timeout(self, sensor_data: List[Dict], timeout: int) -> List[AnomalyAlert]:
+        import signal
+        from functools import wraps
+        import time
+
+        def timeout_decorator(func):
+            def _handle_timeout(signum, frame):
+                raise TimeoutError()
+            def wrapper(*args, **kwargs):
+                signal.signal(signal.SIGALRM, _handle_timeout)
+                signal.alarm(timeout)
+                try:
+                    result = func(*args, **kwargs)
+                finally:
+                    signal.alarm(0)
+                return result
+            return wrapper
+
+        @timeout_decorator
+        def detect_anomalies_with_timeout_helper(sensor_data: List[Dict]) -> List[AnomalyAlert]:
+            return self.detect_anomalies(sensor_data)
+
+        try:
+            return detect_anomalies_with_timeout_helper(sensor_data)
+        except TimeoutError:
+            logger.error(f'Anomaly detection timed out after {timeout} seconds')
+            raise AnomalyDetectionError('Anomaly detection timed out')
