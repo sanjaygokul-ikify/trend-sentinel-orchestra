@@ -83,3 +83,22 @@ class Engine:
         except TimeoutError:
             logger.error(f'Anomaly detection timed out after {timeout} seconds')
             raise AnomalyDetectionError('Anomaly detection timed out')
+
+    def detect_anomalies(self, sensor_data: List[Dict] = None) -> List[AnomalyAlert]:
+        if sensor_data is None:
+            sensor_data = [self.sensor_data.to_dict()]
+        if not self.anomaly_detection_model:
+            raise AnomalyDetectionError('Anomaly detection model not loaded')
+        try:
+            # Use the loaded model to detect anomalies in the sensor data
+            anomalies = []
+            for data in sensor_data:
+                # Apply the model to the data
+                if data.get('id') and data.get('value'):
+                    if self.anomaly_detection_model:
+                        # If the model detects an anomaly, add it to the list
+                        anomalies.append(AnomalyAlert(data['id'], data['value']))
+            return anomalies
+        except Exception as e:
+            logger.error(f'Failed to detect anomalies: {str(e)}')
+            raise AnomalyDetectionError('Failed to detect anomalies')
